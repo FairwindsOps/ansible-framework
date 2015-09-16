@@ -1,0 +1,15 @@
+server {
+    listen {{ server_port | default(80) }};
+
+    server_name www.{{ domain }};
+    # $scheme will get the http protocol
+    # and 301 is best practice for tablet, phone, desktop and seo
+    return 301 $scheme://{{ domain }}$request_uri;
+
+    root {{ sitepath }};
+    index index.html index.htm
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}

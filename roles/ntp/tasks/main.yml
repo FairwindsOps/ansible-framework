@@ -1,0 +1,13 @@
+---
+
+- stat: path=/setup-ntp.log
+  register: setup
+
+- name: install the ntp package
+  apt: name=ntp state=present
+
+- name: configure ntp file
+  template: src=etc/ntp.conf.j2 dest=/etc/ntp.conf
+  notify: ntp-restart
+
+- include: ../scripts/log-step.yml step=ntp

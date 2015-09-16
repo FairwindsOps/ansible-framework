@@ -1,0 +1,11 @@
+---
+
+- name: create shared downloads directory
+  sudo: yes
+  file: name={{ archives }} state=directory
+
+- name: download the {{ name }} archive
+  sudo: yes
+  shell: test -f {{ archives }}/{{ name }} || curl -L {{ url }}
+         > {{ archives }}/{{ name }} chdir={{ archives }}
+

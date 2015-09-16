@@ -1,0 +1,77 @@
+---
+
+- stat: path=/setup-rabbitmq.log
+  register: setup
+
+- name: install rabbitmq sdk
+  apt: name=librabbitmq-dbg state=present
+
+- name: download rabbitmq server
+  sudo: yes
+  shell: test -f /tmp/rabbitmq.deb
+         || curl -L {{ rabbitmq_download }} > /tmp/rabbitmq.deb
+         chdir=/tmp creates=/setup-rabbitmq.log
+
+- name: unpack rabbitmq server
+  sudo: yes
+  shell: dpkg -i /tmp/rabbitmq.deb || exit 0 chdir=/tmp
+         creates=/setup-rabbitmq.log
+
+- name: install rabbitmq server
+  sudo: yes
+  shell: apt-get -f --force-yes --yes install
+         creates=/setup-rabbitmq.log
+
+- name: add rabbitmq application virtual host
+  sudo: yes
+  shell: rabbitmqctl add_vhost {{ rabbitmq_vhost }}
+         creates=/setup-rabbitmq.log
+
+- name: add rabbitmq admin user
+  sudo: yes
+  shell: rabbitmqctl add_user {{ rabbitmq_admin_user }}
+         {{ rabbitmq_admin_password }}
+         creates=/setup-rabbitmq.log
+
+- name: tag rabbitmq admin user
+  sudo: yes
+  shell: rabbitmqctl set_user_tags {{ rabbitmq_admin_user }} administrator
+         creates=/setup-rabbitmq.log
+
+- name: set rabbitmq admin permissions on the default vhost
+  sudo: yes
+  shell: rabbitmqctl set_permissions -p /
+         {{ rabbitmq_admin_user }} .\* .\* .\*
+         creates=/setup-rabbitmq.log
+
+- name: set rabbitmq admin permissions on the declared vhost
+  sudo: yes
+  shell: rabbitmqctl set_permissions -p {{ rabbitmq_vhost }}
+         {{ rabbitmq_admin_user }} .\* .\* .\*
+         creates=/setup-rabbitmq.log
+
+- name: add rabbitmq application user
+  sudo: yes
+  shell: rabbitmqctl add_user {{ rabbitmq_user_user }}
+         {{ rabbitmq_user_password }}
+         creates=/setup-rabbitmq.log
+
+- name: set rabbitmq user permissions on the default vhost
+  sudo: yes
+  shell: rabbitmqctl set_permissions -p /
+         {{ rabbitmq_user_user }} .\* .\* .\*
+         creates=/setup-rabbitmq.log
+
+- name: set rabbitmq user permissions on the declared vhost
+  sudo: yes
+  shell: rabbitmqctl set_permissions -p {{ rabbitmq_vhost }}
+         {{ rabbitmq_user_user }} .\* .\* .\*
+         creates=/setup-rabbitmq.log
+
+- name: install rabbitmq management plugin
+  sudo: yes
+  shell: rabbitmq-plugins enable rabbitmq_management
+         creates=/setup-rabbitmq.log
+  notify: rabbitmq-restart
+
+- include: ../scripts/log-step.yml step=rabbitmq

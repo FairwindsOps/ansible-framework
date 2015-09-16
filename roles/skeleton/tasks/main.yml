@@ -1,0 +1,21 @@
+---
+
+- stat: path=/setup-skeleton.log
+  register: setup
+
+- name: ensure the git package is installed
+  apt: name=git state=present
+
+- name: remove the system default skeleton
+  sudo_user: root
+  shell: test -f /etc/skel/.git || rm -Rf /etc/skel
+
+- name: git checkout the skeleton repository
+  sudo_user: root
+  git: repo={{ skeleton_repository }}
+       dest=/etc/skel
+       key_file=/root/.ssh/deploy
+       accept_hostkey=yes
+       update=no
+
+- include: ../scripts/log-step.yml step=skeleton

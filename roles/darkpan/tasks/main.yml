@@ -1,0 +1,18 @@
+---
+
+- stat: path=/setup-darkpan.log
+  register: setup
+
+- name: send deploy key to root user
+  sudo: yes
+  copy: src={{ modules_deploykey }} dest=/root/.ssh/deploy mode=0600
+
+- name: git checkout modules from the repository
+  sudo: yes
+  git: repo={{ modules_repository }}
+       dest={{ base }}/darkpan
+       key_file=/root/.ssh/deploy
+       accept_hostkey=yes
+       update=yes
+
+- include: ../scripts/log-step.yml step=darkpan

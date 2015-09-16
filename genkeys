@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+    echo "ERROR: No username provided";
+    echo "USAGE: genkeys <username>";
+    exit 1;
+fi
+
+mkdir -p keys;
+
+# generate SSH pub/private key pair
+ssh-keygen -t rsa -f "keys/$1";
+chmod 0600 keys/$1*;
+chmod 0664 keys/$1.pub;
+
+exit 0;

@@ -1,0 +1,11 @@
+---
+
+- name: download public keys for the select user(s)
+  sudo_user: "{{ item }}"
+  fetch: src=/home/{{ item }}/.ssh/id_rsa.pub
+         dest="{{ '/tmp/ansible/pubkeys/' + item + '.' 
+         + hostvars[inventory_hostname].ansible_hostname + '.pub' }}"
+         validate_checksum=no
+         fail_on_missing=yes
+         flat=yes
+  with_items: publickey_download_from_users

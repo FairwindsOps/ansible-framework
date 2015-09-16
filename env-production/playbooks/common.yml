@@ -1,0 +1,10 @@
+---
+
+- sudo:  yes
+  hosts: all
+
+  roles:
+    - common
+    - ubic
+    - ntp
+

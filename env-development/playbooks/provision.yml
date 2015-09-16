@@ -1,0 +1,49 @@
+---
+
+- name: configure security
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+
+    - ec2_group:
+        name: control
+        description: control machine security group
+        region: us-east-1
+        rules:
+          - type: ssh
+            proto: tcp
+            from_port: 22
+            to_port: 22
+            cidr_ip: 0.0.0.0/0
+        rules_egress:
+          - type: all
+            proto: all
+            cidr_ip: 0.0.0.0/0
+
+- name: provision control machine(s)
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+
+    - ec2:
+        group: control
+        key_name: abundant
+        image: ami-73799918
+        vpc_subnet_id: subnet-ac355396
+        instance_type: t2.micro
+        aws_region: us-east-1
+        wait_timeout: 500
+        wait: yes
+        monitoring: no
+        assign_public_ip: no
+        exact_count: 1
+        count_tag:
+            Name: control
+        instance_tags:
+            Name: control
+            name: control
+

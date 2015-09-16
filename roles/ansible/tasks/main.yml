@@ -1,0 +1,20 @@
+---
+
+- stat: path=/setup-ansible.log
+  register: setup
+
+- name: add ansible repository from PPA
+  sudo: yes
+  apt_repository: repo='ppa:ansible/ansible' state=present
+
+- name: update the packages repository
+  sudo: yes
+  apt: update_cache=yes
+  when: not setup.stat.exists
+
+- name: install ansible package
+  sudo: yes
+  apt: name=ansible state=present
+  when: not setup.stat.exists
+
+- include: ../scripts/log-step.yml step=ansible

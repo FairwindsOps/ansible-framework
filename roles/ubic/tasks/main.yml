@@ -1,0 +1,49 @@
+---
+
+- stat: path=/setup-ubic.log
+  register: setup
+
+- name: install Ubic and related modules via cpanm
+  sudo_user: root
+  shell: cpanm -q -n -f {{ item }}
+  with_items: ["Ubic", "Ubic::Service::InitScriptWrapper"]
+
+- name: setup Ubic using batch-mode
+  sudo_user: root
+  shell: ubic-admin setup --batch-mode --no-crontab
+
+- name: install the Ubic on-reboot cron job - reset
+  sudo_user: root
+  cron: name="ubic onreboot"
+        cron_file=ubic-onreboot
+        job="rm -Rf /var/lib/ubic/{lock,status}/*"
+        special_time="reboot"
+        user="root" 
+
+- name: install the Ubic on-reboot cron job - start
+  sudo_user: root
+  cron: name="ubic onreboot start"
+        cron_file=ubic-onreboot
+        job="ubic start -f"
+        special_time="reboot"
+        user="root" 
+
+- name: install the Ubic on-reboot cron job - watch
+  sudo_user: root
+  cron: name="ubic onreboot watch"
+        cron_file=ubic-onreboot
+        job="{{ watchdog_prefix  }} {{ watchdog_process }} {{ watchdog_service }} 
+        >>{{ watchdog_logfile }} 2>>{{ watchdog_logfile }}"
+        special_time="reboot"
+        user="root" 
+
+- name: install the Ubic on-time cron job
+  sudo_user: root
+  cron: name="ubic ontime"
+        cron_file=ubic-ontime
+        job="{{ watchdog_prefix  }} {{ watchdog_process }} {{ watchdog_service }} 
+        >>{{ watchdog_logfile }} 2>>{{ watchdog_logfile }}"
+        day="*" hour="*" minute="*" month="*"
+        user="root"
+
+- include: ../scripts/log-step.yml step=ubic

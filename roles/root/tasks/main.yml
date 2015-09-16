@@ -1,0 +1,26 @@
+---
+
+- stat: path=/setup-root.log
+  register: setup
+
+- name: grant control machine user access to root
+  sudo_user: root
+  authorized_key: key="{{ lookup('file', publickey) }}" user=root
+
+- name: create ssh deploy key for root user
+  sudo_user: root
+  copy: src={{ root_deploykey }}
+        dest="/root/.ssh/deploy"
+        owner=root
+        group=root
+        mode=0600
+
+- name: create ssh config for root user
+  sudo_user: root
+  template: src=.ssh/config.j2
+            dest="/root/.ssh/config"
+            owner=root
+            group=root
+            mode=0644
+
+- include: ../scripts/log-step.yml step=root

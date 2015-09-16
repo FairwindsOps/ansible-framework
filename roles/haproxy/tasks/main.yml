@@ -1,0 +1,52 @@
+---
+
+- stat: path=/setup-haproxy.log
+  register: setup
+
+- name: install haproxy package
+  apt: name=haproxy state=present
+
+- name: download haproxy server
+  sudo: yes
+  shell: test -f /tmp/haproxy.tgz
+         || curl -L {{ haproxy_download }}
+         > /tmp/haproxy.tgz chdir=/tmp creates=/var/log/haproxy-setup.log
+
+- name: create the haproxy directory
+  sudo: yes
+  file: path=/tmp/haproxy state=directory
+
+- name: unpack haproxy server
+  sudo: yes
+  shell: tar -vxzf /tmp/haproxy.tgz --strip 1 -C /tmp/haproxy
+         chdir=/tmp creates=/var/log/haproxy-setup.log
+
+- name: make haproxy server
+  sudo: yes
+  shell: make TARGET=linux26 USE_OPENSSL=1 ADDLIB=-lz
+         chdir=/tmp/haproxy creates=/var/log/haproxy-setup.log
+
+- name: install haproxy server
+  sudo: yes
+  shell: make PREFIX=/usr/local/haproxy install
+         chdir=/tmp/haproxy creates=/var/log/haproxy-setup.log
+
+- name: install haproxy ssl cert
+  sudo: yes
+  shell: cat {{ haproxy_sslcert_keyfile }}
+         {{ haproxy_sslcert_crtfile }} >
+         {{ haproxy_sslcert_pemfile }}
+         creates=/var/log/haproxy-setup.log
+
+- name: replace running haproxy server
+  sudo: yes
+  shell: mv /usr/local/haproxy/sbin/haproxy $(which haproxy)
+         creates=/var/log/haproxy-setup.log
+
+- name: create the haproxy options config
+  sudo: yes
+  template: src=etc/default/haproxy.j2
+            dest=/etc/default/haproxy
+            owner=root
+
+- include: ../scripts/log-step.yml step=haproxy

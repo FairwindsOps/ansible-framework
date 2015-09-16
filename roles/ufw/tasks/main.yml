@@ -1,0 +1,15 @@
+---
+
+- stat: path=/setup-ufw.log
+  register: setup
+
+- name: install the ufw package
+  apt: name=ufw state=present
+
+- name: enable firewall
+  shell: ufw --force enable
+
+- name: create ssh firewall exception
+  shell: ufw allow 22
+
+- include: ../scripts/log-step.yml step=ufw

@@ -1,0 +1,53 @@
+---
+
+- stat: path=/setup-users.log
+  register: setup
+
+- group: name={{ item }} state=absent
+  with_items: removeusers
+
+- user:  name={{ item }} state=absent
+  with_items: removeusers
+
+- group: name={{ item }} state=present
+  with_items: superusers
+
+- name: create superusers accounts
+  with_items: superusers
+  user: name={{ item }}
+        generate_ssh_key=yes
+        group=sudo
+        password={{ usersettings[item]['password_encrypted'] }}
+        shell=/bin/bash
+        update_password=always
+
+- name: grant control machine user access to superusers
+  sudo_user: "{{ item }}"
+  authorized_key: key="{{ lookup('file', publickey) }}" user={{ item }}
+  with_items: superusers
+
+- name: create ssh config for superusers
+  sudo_user: root
+  template: src=.ssh/config.j2
+            dest="/home/{{ item }}/.ssh/config"
+            owner={{ item }}
+            group={{ item }}
+            mode=0644
+  with_items: superusers
+
+- name: create ssh deploy key for superusers
+  sudo_user: root
+  copy: src={{ users_deploykey }}
+        dest="/home/{{ item }}/.ssh/deploy"
+        owner={{ item }}
+        group={{ item }}
+        mode=0600
+  with_items: superusers
+
+- name: rsync the skeleton files into the home of superusers
+  sudo_user: root
+  shell: "rsync -a --chown={{ item }}:{{ item }} -f\"- .git/\"\
+          -f\"+ *\" /etc/skel/* /etc/skel/.??* /home/{{ item }}"
+  with_items: superusers
+
+- include: ../scripts/log-step.yml step=users

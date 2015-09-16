@@ -1,0 +1,13 @@
+---
+
+- name: ubic-start
+  service: name=ubic state=started
+
+- name: ubic-stop
+  service: name=ubic state=stopped
+
+- name: ubic-reload
+  service: name=ubic state=reloaded
+
+- name: ubic-restart
+  service: name=ubic state=restarted

@@ -1,0 +1,13 @@
+---
+
+- name: rabbitmq-start
+  service: name=rabbitmq-server state=started
+
+- name: rabbitmq-stop
+  service: name=rabbitmq-server state=stopped
+
+- name: rabbitmq-reload
+  service: name=rabbitmq-server state=reloaded
+
+- name: rabbitmq-restart
+  service: name=rabbitmq-server state=restarted

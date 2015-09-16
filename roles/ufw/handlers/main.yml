@@ -1,0 +1,13 @@
+---
+
+- name: ufw-start
+  service: name=ufw state=started
+
+- name: ufw-stop
+  service: name=ufw state=stopped
+
+- name: ufw-reload
+  service: name=ufw state=reloaded
+
+- name: ufw-restart
+  service: name=ufw state=restarted

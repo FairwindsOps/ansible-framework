@@ -1,0 +1,9 @@
+---
+
+- name: creating ubic service for {{ service }}
+  sudo_user: root
+  template: src={{ template }}
+            dest=/etc/ubic/service/{{ service }}
+            mode=0644
+            owner=root
+            group=root

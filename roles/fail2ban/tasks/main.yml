@@ -1,0 +1,9 @@
+---
+
+- stat: path=/setup-fail2ban.log
+  register: setup
+
+- name: install the fail2ban package
+  apt: name=fail2ban state=present
+
+- include: ../scripts/log-step.yml step=fail2ban

@@ -1,0 +1,12 @@
+---
+
+- shell: date +%Y%m%d%H%M%S
+  register: timestamp
+  ignore_errors: true
+
+- name: logging role step {{ step }}
+  sudo: yes
+  copy: dest=/setup-{{ step }}.log
+        force=yes
+        mode=0644
+        content="{{ timestamp }}"

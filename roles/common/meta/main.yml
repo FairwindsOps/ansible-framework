@@ -1,0 +1,6 @@
+---
+
+dependencies:
+  - role: cron
+  - role: skeleton
+  - role: users

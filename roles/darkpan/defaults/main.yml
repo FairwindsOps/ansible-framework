@@ -1,0 +1,5 @@
+---
+
+# modules vars
+modules_repository: "git@bitbucket.org:USERNAME/darkpan.git"
+modules_deploykey:  "{{ workspace }}/keys/deploy"

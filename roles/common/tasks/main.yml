@@ -1,0 +1,52 @@
+---
+
+- stat: path=/setup-common.log
+  register: setup
+
+- name: update the packages repository
+  sudo: yes
+  apt: update_cache=yes
+  when: not setup.stat.exists
+
+- name: install common packages
+  sudo: yes
+  apt: name={{ item }} state=present
+  with_items: common['apt_packages']
+  when: not setup.stat.exists
+
+- name: configure the server hostname
+  hostname: name={{ ec2_id }}
+  sudo: yes
+  when: ec2_id is defined
+
+- name: set hostname as fact
+  set_fact: ansible_hostname={{ ec2_id }}
+  when: ec2_id is defined
+
+- name: create the base services location
+  sudo: yes
+  file: path={{ base }}
+        state=directory
+        owner={{ superusers[0] }}
+        group=sudo
+        mode=0775
+
+- name: create the central archives location
+  sudo: yes
+  file: path={{ archives }} state=directory
+
+- name: install the /etc/hosts file
+  sudo: yes
+  template: src=etc/hosts.j2 dest=/etc/hosts
+
+- name: configure the ssh daemon
+  sudo: yes
+  template: src=etc/ssh/sshd_config.j2 dest=/etc/ssh/sshd_config mode=0644
+  notify: ssh-reload
+
+- name: install non-core Perl dependencies via cpanm
+  sudo: yes
+  shell: "cpanm -q -n -f {{ common['perl_modules'] | join(' ') }}"
+  when: not setup.stat.exists
+
+- include: ../scripts/log-step.yml step=common

@@ -1,0 +1,15 @@
+---
+
+# rabbitmq vars
+rabbitmq_port:  5672
+rabbitmq_vhost: "/{{ project }}"
+
+rabbitmq_download: "http://www.rabbitmq.com/releases/rabbitmq-server/\
+                    v3.3.5/rabbitmq-server_3.3.5-1_all.deb"
+
+rabbitmq_admin_user:     "{{ username }}"
+rabbitmq_admin_password: "{{ password_plaintext }}"
+
+rabbitmq_user_user:     "user"
+rabbitmq_user_password: "{{ password_plaintext }}"
+

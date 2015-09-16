@@ -1,0 +1,96 @@
+---
+# VARIABLES HERE ARE SPECIFIC TO THE PRODUCTION ENV
+# VARIABLES HERE ARE APPLICABLE TO ALL HOST GROUPS
+# VARIABLES HERE ARE USED TO DEFINE GLOBAL VARIABLES
+# VARIABLES HERE ARE OVERRIDDEN BY DEFAULT VARIABLES
+
+# UNIQUE NAME FOR PROJECT
+project: "abundant"
+
+# BASE SERVICES DIRECTORY
+base: "/srv"
+
+# CONTROL USER'S HOME DIRECTORY
+home: "{{ lookup('env', 'HOME') }}"
+
+# CONTROL USER'S WORKSPACE DIRECTORY
+workspace: "{{ lookup('env', 'PWD') }}"
+
+# DIRECTORY PATH WHERE DOWNLOADED ARE KEPT
+archives: /usr/local/share/downloads
+
+# CONTROL USER'S PUBLIC SSH KEY
+publickey: ~/.ssh/id_rsa.pub
+
+# DIRECTORY PATH WHERE PASSWORDS ARE KEPT
+passwords: "{{ workspace + '/' + 'passwords' }}"
+
+# SUPER USER ACCOUNTS
+superusers:
+  - ubuntu
+  - alnewkirk
+
+# REMOVE USER ACCOUNTS
+removeusers:
+  - vagrant
+
+# USER SETTINGS
+usersettings:
+  ubuntu:
+    password_plaintext: "{{ lookup('file', passwords + '/ubuntu') }}"
+    password_encrypted: "{{ lookup('file', passwords + '/ubuntu' + '.enc') }}"
+  alnewkirk:
+    password_plaintext: "{{ lookup('file', passwords + '/alnewkirk') }}"
+    password_encrypted: "{{ lookup('file', passwords + '/alnewkirk' + '.enc') }}"
+
+# DEFAULT USER SETTINGS
+username: "ubuntu"
+password_plaintext: "{{ usersettings.ubuntu.password_plaintext }}"
+password_encrypted: "{{ usersettings.ubuntu.password_encrypted }}"
+
+# MAIN ETHERNET INTERFACE
+iface: "{{ ansible_default_ipv4.interface }}"
+
+# COMMON GLOBAL VARIABLES
+common:
+  apt_packages:
+    - bash-completion
+    - build-essential
+    - cpanminus
+    - curl
+    - dnsutils
+    - git
+    - libcurl4-openssl-dev
+    - libexpat1-dev
+    - libgcc1-dbg
+    - libgmp-dev
+    - libpcre3-dev
+    - libreadline-dev
+    - libssh2-1-dev
+    - libssl-dev
+    - libxml2
+    - libxml2-dev
+    - libxslt-dev
+    - libxslt1-dev
+    - libyaml-dev
+    - locate
+    - mailutils
+    - make
+    - openssh-server
+    - rsync
+    - sudo
+    - tmux
+    - tree
+    - unzip
+    - vim
+    - wget
+    - whois
+    - zlib1g-dev
+  perl_modules:
+    - "Daemon::Control"
+    - "Parallel::ForkManager"
+    - "Proclet"
+    - "Sys::Hostname"
+    - "Sys::Hostname::FQDN"
+    - "Template"
+

@@ -1,0 +1,13 @@
+---
+
+- name: fail2ban-start
+  service: name=fail2ban state=started
+
+- name: fail2ban-stop
+  service: name=fail2ban state=stopped
+
+- name: fail2ban-reload
+  service: name=fail2ban state=reloaded
+
+- name: fail2ban-restart
+  service: name=fail2ban state=restarted

@@ -1,0 +1,4 @@
+---
+
+hostfile_domain: example.com
+hostfile_groups: [control]

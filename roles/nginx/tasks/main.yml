@@ -1,0 +1,10 @@
+---
+
+- stat: path=/setup-nginx.log
+  register: setup
+
+- name: install nginx package
+  apt: name=nginx state=present
+  notify: nginx-start
+
+- include: ../scripts/log-step.yml step=nginx

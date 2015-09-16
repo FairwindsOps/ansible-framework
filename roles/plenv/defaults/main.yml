@@ -1,0 +1,14 @@
+---
+
+# plenv vars
+plenv_directory:   "{{ base }}/perl"
+plenv_environment: "{{ base }}/perl-env"
+plenv_versions:    "{{ base }}/perl-env/versions"
+plenv_executable:  "{{ base }}/perl/bin/plenv"
+plenv_repository:  "git://github.com/tokuhirom/plenv.git"
+
+# perl-build vars
+plbuild_version:    5.18.0
+plbuild_directory:  "{{ plenv_environment }}/plugins/perl-build"
+plbuild_repository: "git://github.com/tokuhirom/Perl-Build.git"
+

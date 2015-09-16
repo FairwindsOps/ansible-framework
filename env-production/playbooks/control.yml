@@ -1,0 +1,11 @@
+---
+
+- sudo:  yes
+  hosts: security_group_control
+
+  roles:
+    - common
+    - openvpn
+    - ubic
+    - ntp
+

@@ -1,0 +1,6 @@
+---
+
+- name: creating nginx site w/proxy for {{ sitename }}
+  sudo_user: root
+  template: src=nginx/proxy.j2
+            dest=/etc/nginx/sites-available/{{ sitename }}

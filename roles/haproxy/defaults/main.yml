@@ -1,0 +1,10 @@
+---
+
+# haproxy vars
+haproxy_download: "http://haproxy.1wt.eu/download/1.5/src/\
+                   devel/haproxy-1.5-dev18.tar.gz"
+
+haproxy_sslcert_install: false
+haproxy_sslcert_crtfile: /etc/ssl/certs/ssl-cert-snakeoil.pem
+haproxy_sslcert_keyfile: /etc/ssl/private/ssl-cert-snakeoil.key
+haproxy_sslcert_pemfile: /etc/ssl/certs/ssl-cert-snakeoil-bundle.pem

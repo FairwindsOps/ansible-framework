@@ -1,0 +1,42 @@
+#!/bin/bash
+
+if [ -n "$AWS_KEYS" ]; then
+    if [ -f "$AWS_KEYS" ]; then
+        source $AWS_KEYS;
+    fi
+fi
+
+if [ -z "$1" ] || [ -z "$2" ]; then
+    echo "ERROR: No environment or playbook provided";
+    echo "USAGE: playbook <environment> <playbook> [<user>] [<private-key>]";
+    exit 1;
+fi
+
+environment="$1"
+
+if [[ "$environment" != env-* ]]; then
+    environment="env-$environment";
+fi
+
+inventories="${environment}/inventories"
+playbook="${environment}/playbooks/$2.yml"
+
+if   [ -n "$3" ]; then user="$3"
+elif [ -n "$AWS_SSH_USER" ]; then user="$AWS_SSH_USER"
+else user="vagrant"
+fi
+
+if   [ -n "$4" ]; then privatekey="$4"
+elif [ -n "$AWS_SSH_KEY" ]; then privatekey="$AWS_SSH_KEY"
+else privatekey="keys/$user"
+fi
+
+arguments="$playbook -i $inventories --private-key $privatekey -u $user"
+
+# deploying environment configuration
+echo "USING: ansible-playbook $arguments";
+
+#ANSIBLE_NOCOWS=1 ansible-playbook -vvvv $arguments
+ansible-playbook $arguments
+
+exit 0;

@@ -1,0 +1,7 @@
+---
+
+watchdog_service: ubic.watchdog
+watchdog_logfile: /var/log/ubic/watchdog.log
+watchdog_prefix:  ". /etc/environment &&"
+watchdog_process: "perl $(which ubic-watchdog)"
+

@@ -1,0 +1,76 @@
+---
+
+- stat: path=/setup-openvpn.log
+  register: setup
+
+- name: install the required packages
+  apt: name={{ item }} state=present
+  with_items:
+      - openvpn
+      - udev
+      - openssl
+      - dnsmasq
+
+- name: install PAM dependencies
+  apt: name={{item}}
+  when: openvpn_use_pam_users
+  with_items:
+      - libpam-pwdfile
+      - python-passlib
+
+- name: install LDAP dependencies
+  apt: name=openvpn-auth-ldap
+  when: openvpn_use_ldap
+
+- name: extract easy-rsa files
+  unarchive: src=easy-rsa.tar.gz dest={{openvpn_etcdir}}
+
+- name: generate scripts
+  template: src={{item}}.j2 dest={{openvpn_etcdir}}/{{item}} mode=0700
+  with_items: [vars, build-server.sh, build-client.sh, revoke-client.sh]
+
+- name: generate server keys
+  command: "{{openvpn_etcdir}}/build-server.sh"
+  args: { creates: "{{ openvpn_keydir }}" }
+
+- name: generate clients keys
+  command: "{{openvpn_etcdir}}/build-client.sh {{item}}"
+  args: { creates: "{{ openvpn_keydir }}/{{item}}.crt" }
+  with_items: openvpn_clients
+
+- name: generate clients configurations
+  template: src=client.conf.j2 dest={{openvpn_keydir}}/{{item}}.ovpn
+  with_items: openvpn_clients
+  notify: openvpn-pack-clients
+  register: openvpn_clients_changed
+
+- name: setup PAM
+  template: src=openvpn.pam.j2 dest=/etc/pam.d/openvpn
+  when: openvpn_use_pam
+
+- name: configure users
+  htpasswd: path={{openvpn_etcdir}}/users name={{item.name}} password={{item.password}} crypt_scheme=des_crypt
+  with_items: openvpn_use_pam_users
+
+- name: setup LDAP
+  template: src=auth-ldap.conf.j2 dest=/etc/openvpn/auth-ldap.conf
+  when: openvpn_use_ldap
+
+- name: configure server
+  template: src=server.conf.j2 dest={{openvpn_etcdir}}/server.conf
+  notify: openvpn-restart
+
+- name: ensure OpenVPN is started
+  service: name=openvpn state=started enabled=yes
+
+- name: grant client(s) Internet access
+  command: >
+      iptables -t nat -A POSTROUTING -s {{ openvpn_network }}/24
+      -j SNAT --to {{ openvpn_host }}
+  when: openvpn_allow_internet_access and not setup.stat.exists
+
+- name: enable IP forwarding
+  command: sysctl -w net.ipv4.ip_forward=1
+  when: openvpn_allow_internet_access and not setup.stat.exists
+
+- include: ../scripts/log-step.yml step=openvpn

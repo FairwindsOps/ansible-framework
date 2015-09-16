@@ -1,0 +1,20 @@
+#!/bin/bash
+
+if [ -z "$1" ] || [ -z "$2" ]; then
+    echo "ERROR: No username/password provided";
+    echo "USAGE: genpass <username> <password>";
+    exit 1;
+fi
+
+# generate encrypted user password
+username=$1
+plaintext=$2
+
+encrypted=$(openssl passwd -salt $(uuidgen) -1 $plaintext)
+
+echo $plaintext > passwords/$username
+echo $encrypted > passwords/$username.enc
+
+echo "Password files created at passwords/$username";
+
+exit 0;

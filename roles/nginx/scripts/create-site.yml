@@ -1,0 +1,6 @@
+---
+
+- name: creating nginx site for {{ sitename }}
+  sudo_user: root
+  template: src=nginx/site.j2
+            dest=/etc/nginx/sites-available/{{ sitename }}

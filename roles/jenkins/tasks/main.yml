@@ -1,0 +1,38 @@
+---
+
+- stat: path=/setup-jenkins.log
+  register: setup
+
+- name: acquire jenkins key
+  sudo: yes
+  apt_key: url=http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key state=present
+
+- name: add jenkins repository to sources
+  sudo: yes
+  apt_repository: repo='deb http://pkg.jenkins-ci.org/debian binary/' state=present
+
+- name: update the packages repository
+  sudo: yes
+  apt: update_cache=yes
+  when: not setup.stat.exists
+
+- name: create jenkins user group
+  group: name=jenkins state=present
+
+- name: create jenkins user account
+  user: name=jenkins
+        group=jenkins
+        generate_ssh_key=no
+        shell=/bin/false
+
+- name: install jenkins package
+  sudo: yes
+  apt: name=jenkins state=present
+  when: not setup.stat.exists
+
+- name: start jenkins service
+  sudo: yes
+  service: name=jenkins state=started
+  when: not setup.stat.exists
+
+- include: ../scripts/log-step.yml step=jenkins

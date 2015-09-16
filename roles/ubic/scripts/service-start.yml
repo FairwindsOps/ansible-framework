@@ -1,0 +1,5 @@
+---
+
+- name: start the ubic sevice {{ service }}
+  sudo: yes
+  shell: ubic start {{ service }}

@@ -1,0 +1,13 @@
+---
+
+- name: jenkins-start
+  service: name=jenkins state=started
+
+- name: jenkins-stop
+  service: name=jenkins state=stopped
+
+- name: jenkins-reload
+  service: name=jenkins state=reloaded
+
+- name: jenkins-restart
+  service: name=jenkins state=restarted

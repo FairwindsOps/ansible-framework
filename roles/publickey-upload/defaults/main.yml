@@ -1,0 +1,5 @@
+---
+
+publickey_upload_from_hosts: "all"
+publickey_upload_from_users: "{{ superusers }}"
+publickey_upload_into_users: "{{ superusers }}"

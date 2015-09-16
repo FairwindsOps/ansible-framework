@@ -1,0 +1,73 @@
+# NAME
+
+ansible-framework
+
+# DESCRIPTION
+
+Configuration Management Framework using Ansible
+
+# USAGE
+
+    ./run-playbook development postgresql default keys/default
+
+The `run-playbook` command run the specified playbook within the context of a
+specific configuration environment.
+
+    ./run-deployment production application default keys/default
+
+The `run-deployment` command run the specified dpeloyment (i.e. a collection of
+playbooks) within the context of a specific configuration environment.
+
+# DIRECTORY STRUCTURE
+
+    ├── ansible.cfg
+    ├── env-development
+    │   ├── inventories
+    │   └── playbooks
+    ├── env-production
+    │   ├── inventories
+    │   └── playbooks
+    ├── env-staging
+    │   ├── inventories
+    │   └── playbooks
+    ├── genkeys
+    ├── genpass
+    ├── genrole
+    ├── keys
+    │   ├── vagrant
+    │   └── vagrant.pub
+    ├── roles
+    │   ├── ansible
+    │   ├── common
+    │   ├── cron
+    │   ├── darkpan
+    │   ├── fail2ban
+    │   ├── haproxy
+    │   ├── jenkins
+    │   ├── nginx
+    │   ├── ntp
+    │   ├── openvpn
+    │   ├── plenv
+    │   ├── publickey-download
+    │   ├── publickey-upload
+    │   ├── rabbitmq
+    │   ├── root
+    │   ├── skeleton
+    │   ├── system
+    │   ├── ubic
+    │   ├── ufw
+    │   └── users
+    ├── run-deploy
+    ├── run-playbook
+    └── scripts
+
+# AUTHOR
+
+Al Newkirk <al@alnewkirk.com>
+
+# COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by Al Newkirk. License GPLv3+: GNU GPL version 3 or later
+<http://gnu.org/licenses/gpl.html> This is free software: you are free to
+change and redistribute it. There is NO WARRANTY, to the extent permitted by
+law.

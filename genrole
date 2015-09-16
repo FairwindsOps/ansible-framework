@@ -1,0 +1,80 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+    echo "ERROR: No role provided";
+    echo "USAGE: genrole <role>";
+    exit 1;
+fi
+
+mkdir -p roles/$1/meta
+touch roles/$1/meta/main.yml
+cat  >roles/$1/meta/main.yml <<EOF
+---
+
+dependencies:
+  - role: common
+EOF
+
+mkdir -p roles/$1/scripts
+touch roles/$1/scripts/log-step.yml
+cat  >roles/$1/scripts/log-step.yml <<EOF
+---
+
+- shell: date +%Y%m%d%H%M%S
+  register: timestamp
+  ignore_errors: true
+
+- name: logging role step {{ step }}
+  sudo: yes
+  copy: dest=/setup-{{ step }}.log
+        force=yes
+        mode=0644
+        content="{{ timestamp }}"
+EOF
+
+mkdir -p roles/$1/tasks
+touch roles/$1/tasks/main.yml
+cat  >roles/$1/tasks/main.yml <<EOF
+---
+
+- stat: path=/setup-$1.log
+  register: setup
+
+# ... do something
+
+- include: ../scripts/log-step.yml step=$1
+EOF
+
+mkdir -p roles/$1/handlers
+touch roles/$1/handlers/main.yml
+cat  >roles/$1/handlers/main.yml <<EOF
+---
+
+- name: $1-start
+  service: name=$1 state=started
+
+- name: $1-stop
+  service: name=$1 state=stopped
+
+- name: $1-reload
+  service: name=$1 state=reloaded
+
+- name: $1-restart
+  service: name=$1 state=restarted
+EOF
+
+mkdir -p roles/$1/defaults
+touch roles/$1/defaults/.gitignore
+
+mkdir -p roles/$1/files
+touch roles/$1/files/.gitignore
+
+mkdir -p roles/$1/templates
+touch roles/$1/templates/.gitignore
+
+mkdir -p roles/$1/vars
+touch roles/$1/vars/.gitignore
+
+echo "Role created at roles/$1";
+
+exit 0;

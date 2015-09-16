@@ -1,0 +1,11 @@
+---
+
+- name: upload public keys for the select user(s) and group(s)
+  sudo: yes
+  authorized_key: user={{ item[0] }}
+                  key="{{ lookup('file', '/tmp/ansible/pubkeys/' + item[1]
+                  + '.' + hostvars[item[2]].ansible_hostname + '.pub') }}"
+  with_nested:
+    - publickey_upload_into_users
+    - publickey_upload_from_users
+    - groups[publickey_upload_from_hosts]

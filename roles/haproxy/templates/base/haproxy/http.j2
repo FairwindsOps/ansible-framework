@@ -1,0 +1,28 @@
+global
+  maxconn  2000
+  pidfile  /tmp/haproxy.pid
+
+defaults
+  mode    http
+  option  httplog
+  option  dontlognull
+  retries 3
+  timeout server 5s
+  timeout connect 5s
+  timeout client 5s
+
+frontend haproxy
+  bind *:80
+  mode http
+  option httpclose
+  option forwardfor
+  default_backend nginx
+
+backend httpserver
+  mode http
+  balance roundrobin
+  option httpclose
+  option forwardfor
+{% for host in groups[hosts] %}
+  server {{ host | regex_replace('\W', '_') }}_{{ port }} {{ host }}:{{ port }} check
+{% endfor %}

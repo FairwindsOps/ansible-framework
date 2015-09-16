@@ -1,0 +1,9 @@
+---
+
+- name: create the {{ servicename }} group
+  sudo: yes
+  group: name={{ servicename }} state=present
+
+- name: create the {{ servicename }} user
+  sudo: yes
+  user: name={{ servicename }} group={{ servicename }} shell=/bin/bash 

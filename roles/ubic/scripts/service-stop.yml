@@ -1,0 +1,5 @@
+---
+
+- name: stop the ubic sevice {{ service }}
+  sudo: yes
+  shell: ubic stop {{ service }}

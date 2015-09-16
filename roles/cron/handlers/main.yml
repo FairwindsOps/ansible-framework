@@ -1,0 +1,13 @@
+---
+
+- name: cron-start
+  service: name=cron state=started
+
+- name: cron-stop
+  service: name=cron state=stopped
+
+- name: cron-reload
+  service: name=cron state=reloaded
+
+- name: cron-restart
+  service: name=cron state=restarted

@@ -1,0 +1,79 @@
+# declarations
+[security_group_control]
+
+# couchbase servers
+# [couchbase_servers:children]
+# security_group_example
+
+# couchbase master servers
+# [couchbase_master_servers:children]
+# security_group_example
+
+# couchbase slave servers
+# [couchbase_slave_servers:children]
+# security_group_example
+
+# http servers
+# [http_servers:children]
+# security_group_example
+
+# elasticsearch servers
+# [elasticsearch_servers:children]
+# security_group_example
+
+# mongodb servers
+# [mongodb_servers:children]
+# security_group_example
+
+# mongodb config servers
+# [mongodb_config_servers:children]
+# security_group_example
+
+# mongodb replica servers
+# [mongodb_replica_servers:children]
+# security_group_example
+
+# mongodb shard ervers
+# [mongodb_shard_servers:children]
+# security_group_example
+
+# neo4j servers
+# [neo4j_servers:children]
+# security_group_example
+
+# postgresql servers
+# [postgresql_servers:children]
+# security_group_example
+
+# postgresql master servers
+# [postgresql_master_servers:children]
+# security_group_example
+
+# postgresql slave servers
+# [postgresql_slave_servers:children]
+# security_group_example
+
+# tokumx servers
+# [tokumx_servers:children]
+# security_group_example
+
+# tokumx config servers
+# [tokumx_config_servers:children]
+# security_group_example
+
+# tokumx replica servers
+# [tokumx_replica_servers:children]
+# security_group_example
+
+# tokumx shard ervers
+# [tokumx_shard_servers:children]
+# security_group_example
+
+# vagrant servers
+# [vagrant_servers]
+# vagrant1.local
+# vagrant2.local
+# vagrant3.local
+# vagrant4.local
+# vagrant5.local
+

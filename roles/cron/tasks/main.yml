@@ -1,0 +1,14 @@
+---
+
+- stat: path=/setup-cron.log
+  register: setup
+
+- name: install the cron package
+  apt: name=cron state=present
+
+- name: configure system crontab
+  sudo: yes
+  template: src=etc/crontab.j2 dest=/etc/crontab mode=0644
+  notify: cron-restart
+
+- include: ../scripts/log-step.yml step=cron

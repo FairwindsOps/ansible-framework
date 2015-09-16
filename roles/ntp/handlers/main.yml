@@ -1,0 +1,13 @@
+---
+
+- name: ntp-start
+  service: name=ntp state=started
+
+- name: ntp-stop
+  service: name=ntp state=stopped
+
+- name: ntp-reload
+  service: name=ntp state=reloaded
+
+- name: ntp-restart
+  service: name=ntp state=restarted

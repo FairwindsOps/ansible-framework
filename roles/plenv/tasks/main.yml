@@ -1,0 +1,108 @@
+---
+
+- stat: path=/setup-plenv.log
+  register: setup
+
+- name: install the /etc/sudoers.d/plenv file
+  sudo: yes
+  template: src=etc/sudoers.d/plenv.j2
+            dest=/etc/sudoers.d/plenv
+            owner=root
+            group=root
+            mode=0440
+
+- name: checkout the plenv repository
+  sudo: yes
+  git: repo={{ plenv_repository }}
+       dest={{ plenv_directory }}
+       accept_hostkey=yes
+       update=no
+
+- name: checkout the perl-build repository
+  sudo: yes
+  git: repo={{ plbuild_repository }}
+       dest={{ plbuild_directory }}
+       accept_hostkey=yes
+       update=no
+
+- name: add plenv PLENV_ROOT environment variable in /etc/environment
+  lineinfile: >
+    dest=/etc/environment
+    state=present
+    regexp='PLENV_ROOT=.*'
+    line="PLENV_ROOT={{ plenv_environment }}"
+
+- name: add plenv PLENV_VERSION environment variable in /etc/environment
+  lineinfile: >
+    dest=/etc/environment
+    state=present
+    regexp='PLENV_VERSION=[\d\.]+$'
+    line="PLENV_VERSION={{ plbuild_version }}"
+
+- name: add plenv to PATH in /etc/environment
+  lineinfile: >
+    dest=/etc/environment
+    state=present
+    backrefs=yes
+    regexp='PATH=(["]*)((?!.*?{{ plenv_directory }}/bin).*?)(["]*)$'
+    line="PATH=\1{{ plenv_directory }}/bin:\2:\3"
+
+- name: add plenv shims to PATH in /etc/environment
+  lineinfile: >
+    dest=/etc/environment
+    state=present
+    backrefs=yes
+    regexp='PATH=(["]*)((?!.*?{{ plenv_environment }}/shims).*?)(["]*)$'
+    line="PATH=\1{{ plenv_environment }}/shims:\2:\3"
+
+- name: add plenv versioned Perl bin to PATH in /etc/environment
+  lineinfile: >
+    dest=/etc/environment
+    state=present
+    backrefs=yes
+    regexp='PATH=(["]*)((?!.*?{{ item }}).*?)(["]*)$'
+    line="PATH=\1{{ item }}:\2:\3"
+  with_items:
+    - "{{ plenv_versions }}/{{ plbuild_version }}/bin"
+
+- name: install specified Perl version via plenv
+  sudo: yes
+  shell: "{{ plenv_executable }} install {{ plbuild_version }} || exit 0"
+  environment:
+    PLENV_ROOT: "{{ plenv_environment }}"
+    PLENV_VERSION: "{{ plbuild_version }}"
+
+- name: configure Perl version via plenv globally
+  sudo: yes
+  shell: "{{ plenv_executable }} global {{ plbuild_version }}"
+  environment:
+    PLENV_ROOT: "{{ plenv_environment }}"
+    PLENV_VERSION: "{{ plbuild_version }}"
+
+- name: rebuild the shim executables for plenv
+  sudo: yes
+  shell: "{{ plenv_executable }} rehash"
+  environment:
+    PLENV_ROOT: "{{ plenv_environment }}"
+    PLENV_VERSION: "{{ plbuild_version }}"
+
+- name: install the cpanm executable specifically for plenv
+  sudo: yes
+  shell: "{{ plenv_executable }} install-cpanm"
+  environment:
+    PLENV_ROOT: "{{ plenv_environment }}"
+    PLENV_VERSION: "{{ plbuild_version }}"
+
+- name: install common Perl modules via cpanm for plenv
+  sudo: yes
+  shell: "$({{ plenv_executable }} which cpanm)
+         {{ common['perl_modules'] | join(' ') }}"
+  environment:
+    PLENV_ROOT: "{{ plenv_environment }}"
+    PLENV_VERSION: "{{ plbuild_version }}"
+
+- name: set ownership and access for installed Perl version
+  sudo: yes
+  shell: "chown -R root:sudo {{ plenv_versions }}/{{ plbuild_version }}"
+
+- include: ../scripts/log-step.yml step=plenv
